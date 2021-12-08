@@ -1,0 +1,30 @@
+packs:
+- git
+- httpd
+- python3
+- kubectl
+- kubelet
+- kubeadm
+- "iproute-tc"
+- firewalld
+
+services:
+- docker
+- kubelet
+- firewalld
+- httpd
+
+masterPorts:
+- "6443/tcp"
+- "2379-2380/tcp"
+- "10250-10252/tcp"
+- "8285/udp"
+- "8472/udp"
+
+slavePorts:
+- "10250/tcp"
+- "8285/udp"
+- "8472/udp"
+- "30000-32767/tcp"
+
+token_file: join_token

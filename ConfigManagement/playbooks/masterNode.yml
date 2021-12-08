@@ -1,0 +1,47 @@
+- hosts: masternodes
+  vars_files:
+  - varFile
+  tasks:
+  
+
+  - name: updating bridge netfilter
+    lineinfile:
+      dest: /etc/modules-load.d/k8s.conf
+      line: br_netfilter
+      state: present
+      create: yes
+
+  - name: letting iptables see bridged traffic
+    blockinfile:
+      path: /etc/sysctl.d/k8s.conf
+      block: |
+        net.bridge.bridge-nf-call-ip6tables = 1
+        net.bridge.bridge-nf-call-iptables = 1
+      insertafter: EOF
+      create: yes
+
+  - name: Refresh System variables
+    shell: "sysctl --system"
+
+
+  - name: kubeadm pulling important images
+    shell: kubeadm config images pull
+
+  - name: starting the cluster with master node
+    shell: kubeadm init --pod-network-cidr=10.244.0.0/16  --ignore-preflight-errors=NumCPU --ignore-preflight-errors=Mem
+    register: output
+
+  - name: Storing Logs and Generated token for future purpose.
+    local_action: copy content={{ output.stdout }} dest={{ token_file }}
+    become: False
+
+  - name: making required changes and updates
+    shell: |
+      mkdir -p $HOME/.kube
+      sudo cp -f /etc/kubernetes/admin.conf $HOME/.kube/config
+      sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+  - name: setup flannel
+    command: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+
+

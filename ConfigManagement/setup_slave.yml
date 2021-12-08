@@ -1,0 +1,4 @@
+---
+- import_playbook: playbooks/basicConfig.yml
+- import_playbook: playbooks/slaveNode.yml
+

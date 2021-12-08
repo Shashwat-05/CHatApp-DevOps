@@ -1,0 +1,94 @@
+- hosts: k8scluster
+
+  vars_files:
+  - varFile
+  tasks:
+  
+
+
+  - name: turning off selinux
+    selinux:
+      state: disabled
+
+  - name: disable swap on 
+    shell: swapoff -a
+
+  - name: commenting swap entries in fstab
+    replace:
+      path: /etc/fstab
+      regexp: '(^/.*swap*)'
+      replace: '# \1'
+
+  - name: adding ips of each other
+    lineinfile:
+      dest: /etc/hosts
+      regexp: '.*{{ item }}$'
+      line: "{{ hostvars[item].ansible_host }} {{ item }}"
+      state: present
+    when: hostvars[item].ansible_host is defined
+    with_items: "{{ groups.all }}"
+
+
+  - name: setting up k8s official repo
+    yum_repository:
+      name: kubernetes
+      description: official k8s repo
+      baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+      enabled: yes
+      gpgcheck: yes
+      repo_gpgcheck: yes
+      gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+  
+  - name: Installing Docker 
+    shell: |
+      yum install -y yum-utils device-mapper-persistent-data lvm2
+      yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+      yum install docker-ce -y --skip-broken --nobest
+  
+  - name: Installing core packages
+    yum:
+      name: "{{ packs }}"
+      state: present
+
+  - name: enable kueblet and docker service
+    service:
+      name: "{{ item }}"
+      state: started
+      enabled: yes
+    with_items: "{{ services }}"
+
+  - name: setting firewall rules
+    firewalld:
+      port: "{{ item }}"
+      state: enabled
+      permanent: yes
+      immediate: yes
+    with_items: "{{ masterPorts if ('masternodes' in group_names) else slavePorts }}"
+
+  - name: allow masquerading
+    firewalld:
+      masquerade: "yes"
+      state: enabled
+      permanent: yes
+      immediate: yes
+
+  - name: Enabling Bridge Firewall Rule
+    shell: "echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables"
+
+  - name: Making systemd as Cgroup Driver...
+    copy:
+      src: daemon.json
+      dest: /etc/docker/daemon.json
+    notify: RestartDocker
+  
+  - name: reloading daemon
+    shell: "systemctl daemon-reload"
+
+  handlers:
+  - name: RestartDocker
+    service:
+      name: docker
+      state: restarted
+
+- import_playbook: masterNode.yml
+- import_playbook: slaveNode.yml
