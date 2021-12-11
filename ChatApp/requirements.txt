@@ -5,4 +5,4 @@ python-socketio==4.6.0
 Flask-Session==0.3.2
 eventlet
 Flask-PyMongo
-py-bcrypt
+bcrypt
