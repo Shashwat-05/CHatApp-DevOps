@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session
 from flask_socketio import SocketIO, join_room, leave_room, emit
 from flask_session import Session
 from flask_pymongo import PyMongo
-
+import bcrypt
 
 
 app = Flask(__name__)
@@ -74,7 +74,7 @@ def login():
     login_user = users.find_one({'name' : request.form['username']})
 
     if login_user:
-        if request.form['pass'] == login_user['password']:
+        if bcrypt.hashpw(request.form['pass'].encode('utf-8'), login_user['password']) == login_user['password']:
             session['username'] = request.form['username']
             return redirect(url_for('index'))
 
@@ -87,7 +87,7 @@ def register():
         existing_user = users.find_one({'name' : request.form['username']})
         
         if existing_user is None:
-            hashpass = request.form['pass']
+            hashpass = bcrypt.hashpw(request.form['pass'].encode('utf-8'), bcrypt.gensalt())
             users.insert_one({'name' : request.form['username'], 'password' : hashpass})
             session['username'] = request.form['username']
             return 'user created successfully - log in now' + render_template('index.html')
