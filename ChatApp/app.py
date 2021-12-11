@@ -16,7 +16,7 @@ socketio = SocketIO(app, manage_session=False)
 
 
 app.config['MONGO_DBNAME'] = 'registeredUsers'
-app.config['MONGO_URI'] = 'mongodb://127.0.0.1:27017/registeredUsers'
+app.config['MONGO_URI'] = 'mongodb://18.218.243.89:27017/registeredUsers'
 mongo = PyMongo(app)
 
 
