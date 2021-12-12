@@ -5,6 +5,7 @@ from flask_pymongo import PyMongo
 import bcrypt
 
 
+
 app = Flask(__name__)
 app.debug = True
 app.config['SECRET_KEY'] = 'secret'
