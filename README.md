@@ -23,4 +23,4 @@
 - [ ] Jenkins multi-staging for groovy.
 - [ ] Helm Chats for k8s insides.
 - [ ] Jenkins server pods inside k8s itself.
-- [ ] More dynamic and automated DevOps cycle.
+
