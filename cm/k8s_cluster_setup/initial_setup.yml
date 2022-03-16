@@ -1,11 +1,11 @@
-- hosts: slavenodes
+- hosts: masternodes
 
   vars_files:
   - varFile
   tasks:
   
 
-  - name: setting hostname of slaves
+  - name: set hostname of nodes
     hostname:
       name: "{{ inventory_hostname }}"
 
@@ -93,5 +93,5 @@
       name: docker
       state: restarted
 
-        #- import_playbook: masterNode.yml
+- import_playbook: masterNode.yml
 - import_playbook: slaveNode.yml
