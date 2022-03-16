@@ -1,1 +1,2 @@
-infraprovision/.terraform/*
+#infraprovision/.terraform/*
+infraprovision/.terraform
