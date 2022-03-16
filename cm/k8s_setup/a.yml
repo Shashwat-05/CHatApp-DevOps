@@ -1,0 +1,6 @@
+- hosts: masternodes
+  tasks:
+  - name: set hostname of master
+    hostname:
+      name: "{{ inventory_hostname }}"
+

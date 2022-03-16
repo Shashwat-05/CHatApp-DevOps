@@ -1,10 +1,13 @@
-- hosts: k8scluster
+- hosts: slavenodes
 
   vars_files:
   - varFile
   tasks:
   
 
+  - name: setting hostname of slaves
+    hostname:
+      name: "{{ inventory_hostname }}"
 
   - name: turning off selinux
     selinux:
@@ -90,5 +93,5 @@
       name: docker
       state: restarted
 
-- import_playbook: masterNode.yml
+        #- import_playbook: masterNode.yml
 - import_playbook: slaveNode.yml

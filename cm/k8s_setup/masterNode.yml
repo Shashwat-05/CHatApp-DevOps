@@ -28,7 +28,7 @@
     shell: kubeadm config images pull
 
   - name: starting the cluster with master node
-    shell: kubeadm init --pod-network-cidr=10.244.0.0/16  --ignore-preflight-errors=NumCPU --ignore-preflight-errors=Mem
+    shell: kubeadm init --node-name masternode --pod-network-cidr=10.244.0.0/16  --ignore-preflight-errors=all
     register: output
 
   - name: Storing Logs and Generated token for future purpose.

@@ -1,9 +1,0 @@
-[masternodes]
-master
-
-[slavenodes]
-slave
-
-[k8scluster:children]
-masternodes
-slavenodes
