@@ -1,3 +1,0 @@
----
-- import_playbook: playbooks/basicConfig.yml
-- import_playbook: playbooks/masterNode.yml

@@ -1,10 +1,13 @@
-- hosts: k8scluster
+- hosts: masternodes
 
   vars_files:
   - varFile
   tasks:
   
 
+  - name: set hostname of nodes
+    hostname:
+      name: "{{ inventory_hostname }}"
 
   - name: turning off selinux
     selinux:
