@@ -16,11 +16,10 @@
 `python3 app.py`
 
 ## tasks & updates
-- [x] Ansible setup k8s on AWS/local.
-- [ ] Mongodb, ChatApp and monitoring connection.
-- [ ] Ansible setup Jenkins server.
-- [ ] Terraform provision code for VPCs, N/W, and ec2 for k8s cluster.
-- [ ] Jenkins multi-staging for groovy.
-- [ ] Helm Chats for k8s insides.
-- [ ] Jenkins server pods inside k8s itself.
+- [x] Added Ansible Playbook to setup k8s on AWS/local.
+- [x] Added Ansible Playbook to setup Jenkins server.
+- [x] Added Terraform provision code for VPCs, SGs, and ec2  on AWS.
+- [x] Added Jenkinsfile groovy code for multi-branch pipeline.
+- [x] K8s yaml files for deployment of application.
+- [ ] To Add monitoring using grafana & prometheus.
 
