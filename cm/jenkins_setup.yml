@@ -1,0 +1,108 @@
+- name: confiure the jenkins server
+  hosts: jenkins
+  tasks:
+    - name: creating a mount point dir
+      file:
+        path: /dvd
+        state: directory
+
+    - name: mouting the local iso with dvd
+      mount:
+       path: /dvd
+       src: UUID=2021-10-13-03-57-25-00
+       fstype: iso9660
+       state: mounted
+
+    - name: creating local repo(1/2)
+      yum_repository:
+        name: appstream
+        description: local repo1
+        file: dvd
+        baseurl: file:///dvd/AppStream
+        gpgcheck: 0
+        enabled: yes
+    
+    - name: creating local repo(2/2)
+      yum_repository:
+        name: baseurl
+        description: local repo2
+        file: dvd
+        baseurl: file:///dvd/BaseOS
+        gpgcheck: 0
+        enabled: yes
+
+          #    - name: downloading the jenkins repo
+          #      get_url:
+          #    url: https://pkg.jenkins.io/redhat-stable/jenkins.repo
+          #      dest: /etc/yum.repos.d/jenkins.repo
+
+    - name: Installing Docker 
+      shell: |
+        yum install -y yum-utils device-mapper-persistent-data lvm2
+        yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+        yum install docker-ce -y --skip-broken --nobest
+  
+    - name: creating jenkins repo
+      yum_repository:
+        name: jenkins
+        description: jenkins repo
+        file: jenkins
+        baseurl: http://pkg.jenkins.io/redhat-stable
+        gpgcheck: no
+        enabled: yes
+
+    - name: installing all required packages now
+      yum:
+        name:
+          - git
+          - python3
+          - "java-11-openjdk"
+          - jenkins
+        state: present
+
+    - name: reloading daemon
+      systemd:
+        daemon_reload: yes
+
+    
+    - name: creating firewall rules
+      firewalld:
+        service: jenkins
+        permanent: yes
+        state: enabled
+        immediate: yes
+
+    - name: creating firewall rules
+      firewalld:
+        port: 8080/tcp
+        permanent: yes
+        state: enabled
+        immediate: yes
+    
+    - name: firewall rule for http
+      firewalld:
+        service: http
+        zone: public
+        permanent: yes
+        immediate: yes
+        state: enabled
+
+    - name: restaring firewalld
+      service:
+        name: firewalld
+        state: restarted
+
+    - name: starting jenkins server
+      service:
+        name: "{{ item }}"
+        state: started
+        enabled: yes 
+      loop:
+        - jenkins
+        - docker
+
+    - name: installing python unit testings
+      pip:
+        name: 
+          - pylint
+          - pytest
